@@ -6,6 +6,9 @@
 - ✅ **override ترجمه** برای عبارت‌های دلخواه (قابل گسترش)
 - ✅ **رفع ایرادهای UI در حالت فارسی** با CSS سفارشی
 - ✅ **برندینگ Sama Cloud** (نام، رنگ، شعار)
+- ✅ فونت فارسی **Vazirmatn**
+- ✅ ترجمه‌ی اپ‌های **core / files / settings**
+- ✅ ماژول **تجربی تقویم شمسی**
 - ✅ اسکریپت **آپدیت از روی همین گیت**
 
 > نکته‌ی مهم: بخش عمده‌ی ترجمه‌ی فارسی از خودِ Nextcloud (رسمی، جامعه‌محور) می‌آید.
@@ -79,17 +82,22 @@ samacloud/
 ├── README.md
 ├── css/
 │   └── rtl-fixes.css          # رفع ایرادهای UI در حالت فارسی/RTL
-├── l10n/
-│   └── core/
-│       ├── fa.json            # override ترجمه (سمت سرور)
-│       └── fa.js              # override ترجمه (سمت مرورگر)
+├── l10n/                      # override ترجمه (هر زیرپوشه = یک اپ)
+│   ├── core/     (fa.json, fa.js)
+│   ├── files/    (fa.json, fa.js)
+│   └── settings/ (fa.json, fa.js)
+├── experimental/
+│   └── jalali-calendar/       # ماژول تجربی تاریخ شمسی (README جدا دارد)
 └── scripts/
     ├── occ-helper.sh          # تعیین نحوه‌ی اجرای occ (aio/snap/manual)
-    ├── set-language.sh        # فعال‌کردن فارسی + RTL
+    ├── set-language.sh        # فعال‌کردن فارسی + RTL + locale fa_IR
     ├── setup-branding.sh      # برندینگ + نصب Custom CSS
-    ├── apply-translations.sh  # اعمال override ترجمه
+    ├── apply-translations.sh  # اعمال override ترجمه برای همه‌ی اپ‌ها
     └── update.sh              # آپدیت کامل از روی گیت
 ```
+
+> اسکریپت `apply-translations.sh` حالا **خودکار همه‌ی اپ‌های داخل `l10n/`** را اعمال می‌کند.
+> برای اپ جدید کافی است پوشه‌ی `l10n/<app>/` با فایل‌های `fa.json` و `fa.js` بسازی.
 
 ---
 
@@ -115,5 +123,16 @@ samacloud/
 
 ## فونت فارسی
 
-برای خوانایی بهتر، فونت‌هایی مثل **Vazirmatn** در `rtl-fixes.css` پیشنهاد شده‌اند.
-اگر می‌خواهی فونت را هاست کنی، آن را به CSS با `@font-face` اضافه کن.
+فونت **Vazirmatn** به‌صورت پیش‌فرض از Google Fonts در `css/rtl-fixes.css` با `@import`
+بارگذاری می‌شود (نیاز به دسترسی اینترنت سمت مرورگر کاربر دارد).
+اگر می‌خواهی **آفلاین/محلی** باشد، فایل‌های `woff2` را روی سرور بگذار و خط `@import`
+را با `@font-face` و مسیر محلی جایگزین کن.
+
+## 📅 تقویم شمسی (تجربی)
+
+> Nextcloud از تقویم شمسی پشتیبانی رسمی ندارد. تنظیم `fa_IR` فقط اعداد و نام ماه را
+> فارسی می‌کند ولی تاریخ‌ها میلادی می‌مانند.
+
+یک ماژول تجربی برای تبدیل تاریخ‌ها به شمسی در پوشه‌ی
+[`experimental/jalali-calendar/`](experimental/jalali-calendar/) هست.
+روش نصب و هشدارهای مهمش را در README همان پوشه بخوان (ممکن است در برخی نسخه‌ها کامل اعمال نشود).

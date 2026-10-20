@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>jalali</id>
+    <name>Jalali Calendar (Sama Cloud)</name>
+    <summary>نمایش تاریخ شمسی (تجربی)</summary>
+    <description>تزریق سراسریِ moment-jalaali برای نمایش تاریخ‌ها به‌صورت شمسی. تجربی است و ممکن است در همه‌ی بخش‌ها اعمال نشود.</description>
+    <version>0.1.0</version>
+    <licence>agpl</licence>
+    <author>Sama Cloud</author>
+    <namespace>Jalali</namespace>
+    <category>customization</category>
+    <dependencies>
+        <nextcloud min-version="27" max-version="31"/>
+    </dependencies>
+</info>
