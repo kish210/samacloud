@@ -1,0 +1,7 @@
+# همه‌ی اسکریپت‌ها و فایل‌های متنی با LF ذخیره شوند (مهم برای اجرا روی لینوکس)
+* text=auto eol=lf
+*.sh text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
