@@ -20,7 +20,7 @@
     <bugs>https://github.com/kish210/samacloud/issues</bugs>
     <repository>https://github.com/kish210/samacloud</repository>
     <dependencies>
-        <nextcloud min-version="27" max-version="32"/>
+        <nextcloud min-version="27" max-version="40"/>
     </dependencies>
     <repair-steps>
         <post-migration>
