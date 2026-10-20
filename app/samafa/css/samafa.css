@@ -1,0 +1,62 @@
+/* ============================================================
+   Sama FA — استایل فارسی/راست‌به‌چپ + فونت Vazirmatn
+   این استایل توسط اپ روی همه‌ی صفحات بارگذاری می‌شود.
+   ============================================================ */
+
+/* فونت فارسی Vazirmatn (Google Fonts؛ نیاز به اینترنت سمت مرورگر).
+   برای حالت آفلاین، این خط را با @font-face محلی جایگزین کن. */
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
+
+/* فونت فارسی روی کل محیط وقتی زبان فارسی است */
+html[lang="fa"] body,
+html[dir="rtl"] body {
+    font-family: "Vazirmatn", "Sahel", "IRANSans", var(--font-face, "Segoe UI"), sans-serif;
+}
+
+/* ترازبندی متن ورودی‌ها به راست */
+html[dir="rtl"] input[type="text"],
+html[dir="rtl"] input[type="password"],
+html[dir="rtl"] input[type="email"],
+html[dir="rtl"] input[type="search"],
+html[dir="rtl"] textarea {
+    text-align: right;
+}
+
+/* منوی کناری به سمت راست */
+html[dir="rtl"] #app-navigation {
+    border-left: 1px solid var(--color-border);
+    border-right: none;
+}
+
+/* فاصله‌ی آیکن‌ها در منو */
+html[dir="rtl"] .app-navigation-entry-icon,
+html[dir="rtl"] .icon {
+    margin-left: 8px;
+    margin-right: 0;
+}
+
+/* اعداد، اندازه و تاریخ چپ‌چین بمانند تا بهم نریزند */
+html[dir="rtl"] .files-list__row-size,
+html[dir="rtl"] .files-list__row-mtime,
+html[dir="rtl"] time {
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: embed;
+}
+
+/* breadcrumb درست از راست */
+html[dir="rtl"] .breadcrumb {
+    flex-direction: row-reverse;
+}
+
+/* نوار جست‌وجوی یکپارچه */
+html[dir="rtl"] .unified-search__input {
+    padding-right: 36px;
+    padding-left: 12px;
+}
+
+/* جلوگیری از بریدن متن فارسی طولانی در منو */
+html[dir="rtl"] .app-navigation-entry__title {
+    white-space: normal;
+    word-break: break-word;
+}

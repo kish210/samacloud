@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>samafa</id>
+    <name>Sama FA — فارسی و تقویم شمسی</name>
+    <summary>فارسی‌سازی کامل، راست‌به‌چپ، فونت Vazirmatn و تاریخ شمسی برای Nextcloud</summary>
+    <description><![CDATA[
+این اپ محیط Nextcloud را فارسی و راست‌به‌چپ می‌کند، فونت Vazirmatn را اعمال می‌کند،
+زبان و locale را روی فارسی (fa / fa_IR) تنظیم می‌کند و تلاش می‌کند تاریخ‌ها را به شمسی تبدیل کند.
+
+نکته: پشتیبانی تاریخ شمسی تجربی است و با تزریق moment-jalaali انجام می‌شود؛
+در برخی نسخه‌ها/بخش‌ها ممکن است کامل اعمال نشود.
+    ]]></description>
+    <version>1.0.0</version>
+    <licence>agpl</licence>
+    <author>Sama Cloud</author>
+    <namespace>SamaFa</namespace>
+    <category>customization</category>
+    <category>tools</category>
+    <bugs>https://github.com/kish210/samacloud/issues</bugs>
+    <repository>https://github.com/kish210/samacloud</repository>
+    <dependencies>
+        <nextcloud min-version="27" max-version="32"/>
+    </dependencies>
+    <repair-steps>
+        <post-migration>
+            <step>OCA\SamaFa\Migration\SetPersianDefaults</step>
+        </post-migration>
+    </repair-steps>
+</info>

@@ -16,6 +16,24 @@
 
 ---
 
+## ⭐ راه پیشنهادی: اپ یکجای «Sama FA»
+
+اگه نمی‌خوای با اسکریپت‌ها درگیر شی، یه **اپ واقعی Nextcloud** ساخته شده که با یک بار
+نصب و فعال‌سازی، **زبان فارسی + RTL + فونت Vazirmatn + تاریخ شمسی (تجربی)** را با هم اعمال می‌کند:
+
+📁 [`app/samafa/`](app/samafa/) — روش نصب کامل در [README همان پوشه](app/samafa/README.md)
+
+نصب سریع (AIO):
+```bash
+docker cp app/samafa nextcloud-aio-nextcloud:/var/www/html/custom_apps/samafa
+docker exec --user root nextcloud-aio-nextcloud chown -R www-data:www-data /var/www/html/custom_apps/samafa
+docker exec --user www-data nextcloud-aio-nextcloud php occ app:enable samafa
+```
+
+> بقیه‌ی بخش‌های این README (اسکریپت‌های جدا) برای کسانی است که کنترل دستی بیشتری می‌خواهند.
+
+---
+
 ## نوع نصب خود را مشخص کن
 
 قبل از اجرای اسکریپت‌ها، متغیر `NC_MODE` را بر اساس نصب خودت ست کن:
