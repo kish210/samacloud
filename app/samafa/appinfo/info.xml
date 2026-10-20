@@ -23,6 +23,9 @@
         <nextcloud min-version="27" max-version="40"/>
     </dependencies>
     <repair-steps>
+        <install>
+            <step>OCA\SamaFa\Migration\SetPersianDefaults</step>
+        </install>
         <post-migration>
             <step>OCA\SamaFa\Migration\SetPersianDefaults</step>
         </post-migration>
