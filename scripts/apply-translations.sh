@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
 # ادغام (merge) override ترجمه‌ی فارسی با فایل‌های رسمیِ هر اپ.
-# برخلاف نسخه‌ی قبلی، فایل رسمی را جایگزین نمی‌کند؛ فقط عبارت‌های
-# داخل ../l10n/<app>/fa.json را روی ترجمه‌ی رسمی سوار می‌کند
-# (عبارت‌های ما برنده‌اند) و سپس fa.js را از همان داده بازتولید می‌کند.
+# فایل رسمی را جایگزین نمی‌کند؛ فقط عبارت‌های داخل ../l10n/<app>/fa.json
+# را روی ترجمه‌ی رسمی سوار می‌کند (عبارت‌های ما برنده‌اند) و fa.js را
+# از همان داده بازتولید می‌کند. منطق ادغام در scripts/merge-fa.php است.
 #
 # نکته: بعد از هر آپدیت Nextcloud باید دوباره اجرا شود.
 # ------------------------------------------------------------
@@ -12,6 +12,7 @@ cd "$(dirname "$0")"
 source ./occ-helper.sh
 
 L10N_DIR="$(cd ../l10n && pwd)"
+MERGE_PHP="$(pwd)/merge-fa.php"
 
 case "$NC_MODE" in
   aio)    BASE="/var/www/html" ;;
@@ -19,25 +20,9 @@ case "$NC_MODE" in
   manual) BASE="$MANUAL_PATH" ;;
 esac
 
-dest_dir() { # مسیر l10n هر اپ
+dest_dir() { # مسیر l10n هر اپ (core جداست، بقیه زیر apps/ هستند)
   if [ "$1" = "core" ]; then echo "$BASE/core/l10n"; else echo "$BASE/apps/$1/l10n"; fi
 }
-
-# اسکریپت PHP که official fa.json را با override ادغام و fa.js را بازتولید می‌کند.
-# آرگومان‌ها: 1=appId 2=مسیر fa.json رسمی 3=مسیر fa.js رسمی 4=مسیر override fa.json
-read -r -d '' MERGE_PHP <<'PHP' || true
-$app=$argv[1]; $ofj=$argv[2]; $ofjs=$argv[3]; $ovr=$argv[4];
-$off = is_file($ofj) ? (json_decode(file_get_contents($ofj), true) ?: []) : [];
-$o   = json_decode(file_get_contents($ovr), true) ?: [];
-if (!isset($off['translations'])) $off['translations'] = [];
-$plural = $off['pluralForm'] ?? ($o['pluralForm'] ?? 'nplurals=2; plural=(n > 1);');
-$off['translations'] = array_merge($off['translations'], $o['translations'] ?? []);
-$off['pluralForm'] = $plural;
-file_put_contents($ofj, json_encode($off, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
-$js = 'OC.L10N.register("'.$app.'", '.json_encode($off['translations'], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).', "'.$plural.'");'."\n";
-file_put_contents($ofjs, $js);
-echo "merged ".count($o['translations'] ?? [])." strings into $app\n";
-PHP
 
 for app_dir in "$L10N_DIR"/*/; do
   app="$(basename "$app_dir")"
@@ -47,12 +32,13 @@ for app_dir in "$L10N_DIR"/*/; do
   echo ">> ادغام ترجمه برای اپ: $app"
   case "$NC_MODE" in
     aio)
-      docker cp "$ovr" "$AIO_CONTAINER":/tmp/ovr_fa.json
-      docker exec --user www-data "$AIO_CONTAINER" bash -c "php -r '$(printf '%s' "$MERGE_PHP")' '$app' '$dir/fa.json' '$dir/fa.js' /tmp/ovr_fa.json"
-      docker exec --user root "$AIO_CONTAINER" rm -f /tmp/ovr_fa.json
+      docker cp "$MERGE_PHP" "$AIO_CONTAINER":/tmp/merge-fa.php
+      docker cp "$ovr"       "$AIO_CONTAINER":/tmp/ovr-fa.json
+      docker exec --user www-data "$AIO_CONTAINER" php /tmp/merge-fa.php "$app" "$dir/fa.json" "$dir/fa.js" /tmp/ovr-fa.json
+      docker exec --user root "$AIO_CONTAINER" rm -f /tmp/merge-fa.php /tmp/ovr-fa.json
       ;;
     snap|manual)
-      php -r "$MERGE_PHP" "$app" "$dir/fa.json" "$dir/fa.js" "$ovr"
+      php "$MERGE_PHP" "$app" "$dir/fa.json" "$dir/fa.js" "$ovr"
       ;;
   esac
 done
