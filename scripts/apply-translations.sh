@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # ------------------------------------------------------------
-# اعمال override ترجمه‌ی فارسی روی همه‌ی اپ‌های داخل ../l10n/
-# هر زیرپوشه در l10n/ نام یک اپ است (core, files, settings, ...).
-# نکته: بعد از هر آپدیت نکست‌کلود باید دوباره اجرا شود (update.sh این‌کار را می‌کند).
+# ادغام (merge) override ترجمه‌ی فارسی با فایل‌های رسمیِ هر اپ.
+# برخلاف نسخه‌ی قبلی، فایل رسمی را جایگزین نمی‌کند؛ فقط عبارت‌های
+# داخل ../l10n/<app>/fa.json را روی ترجمه‌ی رسمی سوار می‌کند
+# (عبارت‌های ما برنده‌اند) و سپس fa.js را از همان داده بازتولید می‌کند.
+#
+# نکته: بعد از هر آپدیت Nextcloud باید دوباره اجرا شود.
 # ------------------------------------------------------------
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -10,52 +13,50 @@ source ./occ-helper.sh
 
 L10N_DIR="$(cd ../l10n && pwd)"
 
-# مسیر پایه‌ی نصب نکست‌کلود داخل هر حالت
 case "$NC_MODE" in
   aio)    BASE="/var/www/html" ;;
   snap)   BASE="/var/snap/nextcloud/current/nextcloud/htdocs" ;;
   manual) BASE="$MANUAL_PATH" ;;
 esac
 
-# مسیر مقصد l10n برای یک اپ (core جداست، بقیه زیر apps/ هستند)
-dest_for() {
-  local app="$1"
-  if [ "$app" = "core" ]; then
-    echo "$BASE/core/l10n"
-  else
-    echo "$BASE/apps/$app/l10n"
-  fi
+dest_dir() { # مسیر l10n هر اپ
+  if [ "$1" = "core" ]; then echo "$BASE/core/l10n"; else echo "$BASE/apps/$1/l10n"; fi
 }
 
-# کپی یک فایل به داخل نصب، بسته به حالت
-copy_in() {
-  local src="$1" dst="$2"
-  case "$NC_MODE" in
-    aio)
-      docker cp "$src" "$AIO_CONTAINER":"$dst"
-      docker exec --user root "$AIO_CONTAINER" chown www-data:www-data "$dst"
-      ;;
-    snap)
-      sudo cp "$src" "$dst"
-      ;;
-    manual)
-      sudo cp "$src" "$dst"
-      sudo chown www-data:www-data "$dst"
-      ;;
-  esac
-}
+# اسکریپت PHP که official fa.json را با override ادغام و fa.js را بازتولید می‌کند.
+# آرگومان‌ها: 1=appId 2=مسیر fa.json رسمی 3=مسیر fa.js رسمی 4=مسیر override fa.json
+read -r -d '' MERGE_PHP <<'PHP' || true
+$app=$argv[1]; $ofj=$argv[2]; $ofjs=$argv[3]; $ovr=$argv[4];
+$off = is_file($ofj) ? (json_decode(file_get_contents($ofj), true) ?: []) : [];
+$o   = json_decode(file_get_contents($ovr), true) ?: [];
+if (!isset($off['translations'])) $off['translations'] = [];
+$plural = $off['pluralForm'] ?? ($o['pluralForm'] ?? 'nplurals=2; plural=(n > 1);');
+$off['translations'] = array_merge($off['translations'], $o['translations'] ?? []);
+$off['pluralForm'] = $plural;
+file_put_contents($ofj, json_encode($off, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+$js = 'OC.L10N.register("'.$app.'", '.json_encode($off['translations'], JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES).', "'.$plural.'");'."\n";
+file_put_contents($ofjs, $js);
+echo "merged ".count($o['translations'] ?? [])." strings into $app\n";
+PHP
 
 for app_dir in "$L10N_DIR"/*/; do
   app="$(basename "$app_dir")"
-  dst_dir="$(dest_for "$app")"
-  echo ">> اعمال ترجمه برای اپ: $app"
-  for f in fa.json fa.js; do
-    if [ -f "$app_dir/$f" ]; then
-      copy_in "$app_dir/$f" "$dst_dir/$f"
-    fi
-  done
+  ovr="$app_dir/fa.json"
+  [ -f "$ovr" ] || continue
+  dir="$(dest_dir "$app")"
+  echo ">> ادغام ترجمه برای اپ: $app"
+  case "$NC_MODE" in
+    aio)
+      docker cp "$ovr" "$AIO_CONTAINER":/tmp/ovr_fa.json
+      docker exec --user www-data "$AIO_CONTAINER" bash -c "php -r '$(printf '%s' "$MERGE_PHP")' '$app' '$dir/fa.json' '$dir/fa.js' /tmp/ovr_fa.json"
+      docker exec --user root "$AIO_CONTAINER" rm -f /tmp/ovr_fa.json
+      ;;
+    snap|manual)
+      php -r "$MERGE_PHP" "$app" "$dir/fa.json" "$dir/fa.js" "$ovr"
+      ;;
+  esac
 done
 
 echo ">> پاک‌سازی کش..."
 occ maintenance:repair >/dev/null 2>&1 || true
-echo "✅ override ترجمه برای همه‌ی اپ‌ها اعمال شد."
+echo "✅ ادغام ترجمه انجام شد (ترجمه‌های رسمی حفظ شدند)."
