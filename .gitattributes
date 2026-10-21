@@ -5,3 +5,10 @@
 *.js text eol=lf
 *.json text eol=lf
 *.md text eol=lf
+
+# فایل‌های باینری نباید تبدیل خط بشوند
+*.woff2 binary
+*.woff binary
+*.ttf binary
+*.png binary
+*.jpg binary

@@ -24,7 +24,9 @@ class Application extends App implements IBootstrap {
     public function boot(IBootContext $context): void {
         // استایل راست‌به‌چپ + فونت فارسی روی همه‌ی صفحات
         Util::addStyle(self::APP_ID, 'samafa');
-        // اسکریپت تاریخ شمسی روی همه‌ی صفحات
+        // کتابخانه‌ی تاریخ شمسی (محلی، بدون CDN) — قبل از اسکریپت اصلی بارگذاری می‌شود
+        Util::addScript(self::APP_ID, 'vendor/moment-jalaali');
+        // اسکریپت فعال‌سازی تاریخ شمسی (به ترتیب بعد از کتابخانه اجرا می‌شود)
         Util::addScript(self::APP_ID, 'samafa');
     }
 }

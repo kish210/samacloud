@@ -11,7 +11,7 @@
 نکته: پشتیبانی تاریخ شمسی تجربی است و با تزریق moment-jalaali انجام می‌شود؛
 در برخی نسخه‌ها/بخش‌ها ممکن است کامل اعمال نشود.
     ]]></description>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <licence>agpl</licence>
     <author>Sama Cloud</author>
     <namespace>SamaFa</namespace>

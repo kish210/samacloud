@@ -25,11 +25,13 @@ class SetPersianDefaults implements IRepairStep {
     public function run(IOutput $output): void {
         $this->config->setSystemValue('default_language', 'fa');
         $this->config->setSystemValue('default_locale', 'fa_IR');
+        // منطقه‌ی پیش‌فرض شماره تلفن = ایران (برای اعتبارسنجی درست شماره‌موبایل)
+        $this->config->setSystemValue('default_phone_region', 'IR');
 
         // اگر می‌خواهی همه‌ی کاربرها اجباراً فارسی شوند، دو خط زیر را از کامنت دربیاور:
         // $this->config->setSystemValue('force_language', 'fa');
         // $this->config->setSystemValue('force_locale', 'fa_IR');
 
-        $output->info('زبان پیش‌فرض روی فارسی (fa) و locale روی fa_IR تنظیم شد.');
+        $output->info('زبان=fa، locale=fa_IR و منطقه‌ی تلفن=IR تنظیم شد.');
     }
 }

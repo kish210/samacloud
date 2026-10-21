@@ -3,9 +3,29 @@
    این استایل توسط اپ روی همه‌ی صفحات بارگذاری می‌شود.
    ============================================================ */
 
-/* فونت فارسی Vazirmatn (Google Fonts؛ نیاز به اینترنت سمت مرورگر).
-   برای حالت آفلاین، این خط را با @font-face محلی جایگزین کن. */
-@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
+/* فونت فارسی Vazirmatn — میزبانی‌شده داخل خودِ اپ (بدون وابستگی به Google Fonts).
+   مناسب ایران: نیازی به دسترسی به CDN خارجی نیست. */
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('fonts/vazirmatn-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('fonts/vazirmatn-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    src: url('fonts/vazirmatn-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* فونت فارسی روی کل محیط وقتی زبان فارسی است */
 html[lang="fa"] body,

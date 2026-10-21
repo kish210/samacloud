@@ -1,24 +1,20 @@
 /* ============================================================
-   Sama FA — تاریخ شمسی (تجربی) برای Nextcloud
+   Sama FA — فعال‌سازی تاریخ شمسی (تجربی) برای Nextcloud
    ------------------------------------------------------------
-   این اسکریپت moment-jalaali را بارگذاری می‌کند و moment سراسری
-   را به حالت فارسی/شمسی می‌برد.
-   هشدار: نسخه‌های جدید Nextcloud، moment را داخل ماژول‌های خود
-   bundle می‌کنند؛ بنابراین این override فقط روی بخش‌هایی که از
-   moment سراسری استفاده می‌کنند اثر می‌گذارد و ممکن است همه‌جا
-   اعمال نشود.
+   کتابخانه‌ی moment-jalaali به‌صورت محلی (js/vendor/moment-jalaali.js)
+   قبل از این اسکریپت بارگذاری می‌شود؛ اینجا فقط moment سراسری را به
+   حالت فارسی/شمسی می‌بریم. بدون نیاز به CDN خارجی (مناسب ایران).
+
+   هشدار: نسخه‌های جدید Nextcloud، moment را داخل ماژول‌های خود bundle
+   می‌کنند؛ بنابراین این override فقط روی بخش‌هایی که از moment سراسری
+   استفاده می‌کنند اثر می‌گذارد و ممکن است همه‌جا اعمال نشود.
    ============================================================ */
 (function () {
     "use strict";
 
-    var MOMENT_JALAALI_CDN =
-        "https://cdn.jsdelivr.net/npm/moment-jalaali@0.10.4/build/moment-jalaali.js";
-
     function enablePersian() {
-        if (typeof window.moment === "undefined") {
-            return false;
-        }
-        if (typeof window.moment.loadPersian !== "function") {
+        if (typeof window.moment === "undefined" ||
+            typeof window.moment.loadPersian !== "function") {
             return false;
         }
         try {
@@ -34,31 +30,23 @@
         }
     }
 
-    function loadLibrary() {
+    function start() {
         if (enablePersian()) {
             return;
         }
-        var s = document.createElement("script");
-        s.src = MOMENT_JALAALI_CDN;
-        s.async = true;
-        s.onload = function () {
-            var tries = 0;
-            var timer = setInterval(function () {
-                tries += 1;
-                if (enablePersian() || tries > 20) {
-                    clearInterval(timer);
-                }
-            }, 500);
-        };
-        s.onerror = function () {
-            console.warn("[SamaFA] بارگذاری moment-jalaali از CDN ناموفق بود (دسترسی اینترنت؟).");
-        };
-        document.head.appendChild(s);
+        // اگر کتابخانه هنوز آماده نشده، چند بار با فاصله تلاش کن
+        var tries = 0;
+        var timer = setInterval(function () {
+            tries += 1;
+            if (enablePersian() || tries > 20) {
+                clearInterval(timer);
+            }
+        }, 300);
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", loadLibrary);
+        document.addEventListener("DOMContentLoaded", start);
     } else {
-        loadLibrary();
+        start();
     }
 })();
